@@ -1,3 +1,2 @@
 TTS==0.20.3
 git+https://github.com/m-bain/whisperx.git
-flask==2.3.3

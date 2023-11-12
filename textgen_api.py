@@ -4,7 +4,7 @@ import sys
 import websockets
 
 # For local streaming, the websockets are hosted without ssl - ws://
-HOST = 'localhost:6055'
+HOST = 'localhost:5005'
 URI = f'ws://{HOST}/api/v1/stream'
 
 
