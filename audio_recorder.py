@@ -54,7 +54,7 @@ class AudioRecorder:
             frame_rate=self.sample_rate,
             channels=1  # Mono audio
         )
-        filename = f"wav/temp{time.time()-sample_duration}to{time.time()}.wav"
+        filename = f"wav/temp/temp{time.time()-sample_duration}to{time.time()}.wav"
 
         audio_clip.export(filename, format="wav")
         return filename
