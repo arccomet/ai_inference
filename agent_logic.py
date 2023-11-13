@@ -17,12 +17,13 @@ class VoiceAgentLogic:
 
     def receive_message(self, text_message):
         self.context += f"\n\n### {self.user_name}:\n" + text_message
+        self.context += f"\n\n### {self.ai_name}:\n"
 
         response = asyncio.run(self.get_llm_output_stream(self.context,
                                                           stopping_strings=["\n"],
                                                           top_p=0.9, top_k=50,
                                                           max_new_tokens=200))
-        self.context += f"\n\n### {self.ai_name}:\n" + response
+        self.context += response
 
         with open(self.contect_log_file_path, 'w', encoding='utf-8') as file:
             # Write the string to the file

@@ -13,8 +13,8 @@ import requests
 import multiprocessing
 
 
-url = "http://localhost:7865/receive_audio"
-check_result_url = "http://localhost:7865/try_get_response"
+url = "http://46.188.73.96:40175/receive_audio"
+check_result_url = "http://46.188.73.96:40175/try_get_response"
 
 
 class AudioPlayer:
