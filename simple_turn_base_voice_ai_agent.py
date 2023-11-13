@@ -72,7 +72,7 @@ class SimpleTurnBaseVoiceAgent:
         # If error, we handle it by sending message saying that TTS failed, but you still get the reply text
         except Exception as e:
             result = {"message": f"TTS Failed.",
-                      "text": e,
+                      "text": str(e),
                       "payload": "",
                       "sampleRate": SAMPLE_RATE,
                       "depth": 0

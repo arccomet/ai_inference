@@ -50,7 +50,7 @@ class AudioPlayer:
 
         if response.status_code == 200:
             response_data = response.json()
-            print(response_data)
+            # print(response_data)
             return response_data
         else:
             print(f'Error: {response.text}')
