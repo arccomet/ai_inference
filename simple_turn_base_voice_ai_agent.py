@@ -70,13 +70,14 @@ class SimpleTurnBaseVoiceAgent:
                               }
                     self.result_queue.put_nowait(result)
         # If error, we handle it by sending message saying that TTS failed, but you still get the reply text
-        except:
+        except Exception as e:
             result = {"message": f"TTS Failed.",
-                      "text": reply_text,
+                      "text": e,
                       "payload": "",
                       "sampleRate": SAMPLE_RATE,
                       "depth": 0
                       }
+            print(e)
             self.result_queue.put_nowait(result)
 
     def put_new_job(self, job_obj):

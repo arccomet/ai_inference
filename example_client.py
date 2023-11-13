@@ -12,9 +12,9 @@ import requests
 
 import multiprocessing
 
-
-url = "http://46.188.73.96:40175/receive_audio"
-check_result_url = "http://46.188.73.96:40175/try_get_response"
+ip = "207.193.120.132:40112"
+audio_url = f"http://{ip}/receive_audio"
+check_result_url = f"http://{ip}/try_get_response"
 
 
 class AudioPlayer:
@@ -25,7 +25,7 @@ class AudioPlayer:
 
     def run_audio_player(self):
         while True:
-            time.sleep(3)
+            time.sleep(1)
             data = self.try_get_audio()
             if data.get("payload"):
                 decoded_payload = base64.b64decode(data["payload"])
@@ -50,6 +50,7 @@ class AudioPlayer:
 
         if response.status_code == 200:
             response_data = response.json()
+            print(response_data)
             return response_data
         else:
             print(f'Error: {response.text}')
@@ -79,7 +80,7 @@ def make_api_call(audio_duration):
             "payload": encoded_wav}
 
     # Send POST request
-    response = requests.post(url, json=data)
+    response = requests.post(audio_url, json=data)
 
     if response.status_code == 200:
         response_data = response.json()
