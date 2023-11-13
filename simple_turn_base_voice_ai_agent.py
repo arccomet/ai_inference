@@ -39,8 +39,11 @@ class SimpleTurnBaseVoiceAgent:
 
         # Text to speech
         try:
-            tts_result_generator = self.agent_tts.tts_stream(self.agent_logic.clean_up_text_for_tts(reply_text),
-                                                             output_dir="wav/outputs")
+            tts_prompt = self.agent_logic.clean_up_text_for_tts(reply_text)
+            tts_result_generator = self.agent_tts.tts_stream(tts_prompt, output_dir="wav/outputs")
+
+            print("TTS => ", tts_prompt)
+
             for tts_output in tts_result_generator:
                 output_path = tts_output[0]
                 if not tts_output[1]:  # If tts is still not finished

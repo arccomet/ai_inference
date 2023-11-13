@@ -34,7 +34,7 @@ class AudioPlayer:
                 with wave.open(save_path, "wb") as wav_file:
                     wav_file.setnchannels(1)  # Mono
                     print(data["depth"])
-                    wav_file.setsampwidth(data["depth"]//8)
+                    wav_file.setsampwidth(data["depth"])
                     wav_file.setframerate(int(data["sampleRate"]))  # Sample rate (adjust as needed)
                     wav_file.writeframes(audio_io.read())
 
