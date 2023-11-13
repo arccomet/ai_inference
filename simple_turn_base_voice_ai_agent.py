@@ -47,7 +47,7 @@ class SimpleTurnBaseVoiceAgent:
                     wav_file = AudioSegment.from_wav(output_path)
                     wav_data = wav_file.raw_data
                     encoded_wav = base64.b64encode(wav_data).decode('utf-8')
-                    audio_depth = wav_file.sample_width * 8
+                    audio_depth = wav_file.sample_width
 
                     result = {"message": f"TTS Chunk",
                               "text": "audio chunk",
@@ -60,7 +60,7 @@ class SimpleTurnBaseVoiceAgent:
                     wav_file = AudioSegment.from_wav(output_path)
                     wav_data = wav_file.raw_data
                     encoded_wav = base64.b64encode(wav_data).decode('utf-8')
-                    audio_depth = wav_file.sample_width * 8
+                    audio_depth = wav_file.sample_width
 
                     result = {"message": f"<response end>",
                               "text": reply_text,
@@ -85,7 +85,6 @@ class SimpleTurnBaseVoiceAgent:
         return True
 
     def try_get_result(self):
-        print("Trying to get result")
         try:
             result = self.result_queue.get_nowait()
             return result

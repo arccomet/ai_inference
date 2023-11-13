@@ -25,7 +25,6 @@ def try_get_response():
         if result:
             print(">>>>>>>>>>>>> valid result here")
             response = result
-            response["message"] = "Success"
 
     print(response["message"])
     return jsonify(response), 200
