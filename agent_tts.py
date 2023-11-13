@@ -1,5 +1,4 @@
 import os
-import uuid
 
 import time
 import torch
@@ -17,6 +16,7 @@ from TTS.utils.generic_utils import get_user_data_dir
 
 
 LOW_VRAM = False
+SAMPLE_RATE = 24000
 
 
 model_name = "tts_models/multilingual/multi-dataset/xtts_v2"
@@ -70,7 +70,7 @@ class XttsTTS:
         if not LOW_VRAM:
             self.load_model()
 
-        self.speaker_wav = "wav/input_wavs/female.wav"
+        self.speaker_wav = "wav/input_wavs/Kara_Voice_trimmed_5min.wav"
 
     def get_model(self):
         if LOW_VRAM:
@@ -111,6 +111,29 @@ class XttsTTS:
             torch.cuda.empty_cache()
 
         return output_path
+
+    def tts_stream(self, input_prompt, output_dir):
+        audio_chunks = []
+        text_chunks = break_into_chunks(input_prompt, 20)
+
+        for text_chunk in text_chunks:
+            generator = self.predict(prompt=text_chunk, language="en", audio_file_pth=self.speaker_wav)
+            for data_output in generator:
+                if data_output[0]:
+                    audio_chunks.extend(data_output[0])
+                    chunk = data_output[0]
+                    output_path = output_dir + f"/xtts_output_{utils.time_str()}.wav"
+                    wav = torch.cat(chunk, dim=0)
+                    torchaudio.save(output_path, wav.squeeze().unsqueeze(0).cpu(), SAMPLE_RATE)
+                    yield output_path, 0
+        if LOW_VRAM:
+            del self.model
+            torch.cuda.empty_cache()
+
+        wav = torch.cat(audio_chunks, dim=0)
+        output_path = output_dir + f"/xtts_output_{utils.time_str()}.wav"
+        torchaudio.save(output_path, wav.squeeze().unsqueeze(0).cpu(), SAMPLE_RATE)
+        yield output_path, 1
 
     def predict(self, prompt, language, audio_file_pth):
         print("Predicting")

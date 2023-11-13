@@ -1,5 +1,5 @@
 /wav/outputs
 /wav/example_server_results
-/wav/input_wavs/Kara_Voice_trimmed_5min.wav
 /__pycache__/
 /logs/
+/wav/temp/

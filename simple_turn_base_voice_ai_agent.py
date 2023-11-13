@@ -2,7 +2,7 @@ import base64
 import time
 from queue import Queue, Empty
 
-from agent_tts import XttsTTS
+from agent_tts import XttsTTS, SAMPLE_RATE
 from agent_hear import AgentHear
 from agent_logic import VoiceAgentLogic
 from pydub import AudioSegment
@@ -39,29 +39,45 @@ class SimpleTurnBaseVoiceAgent:
 
         # Text to speech
         try:
-            tts_result_file_path = self.agent_tts.tts_full(self.agent_logic.clean_up_text_for_tts(reply_text),
-                                                           output_dir="wav/outputs")
+            tts_result_generator = self.agent_tts.tts_stream(self.agent_logic.clean_up_text_for_tts(reply_text),
+                                                             output_dir="wav/outputs")
+            for tts_output in tts_result_generator:
+                output_path = tts_output[0]
+                if not tts_output[1]:  # If tts is still not finished
+                    wav_file = AudioSegment.from_wav(output_path)
+                    wav_data = wav_file.raw_data
+                    encoded_wav = base64.b64encode(wav_data).decode('utf-8')
+                    audio_depth = wav_file.sample_width * 8
+
+                    result = {"message": f"TTS Chunk",
+                              "text": "audio chunk",
+                              "payload": encoded_wav,
+                              "sampleRate": SAMPLE_RATE,
+                              "depth": audio_depth
+                              }
+                    self.result_queue.put_nowait(result)
+                else:
+                    wav_file = AudioSegment.from_wav(output_path)
+                    wav_data = wav_file.raw_data
+                    encoded_wav = base64.b64encode(wav_data).decode('utf-8')
+                    audio_depth = wav_file.sample_width * 8
+
+                    result = {"message": f"<response end>",
+                              "text": reply_text,
+                              "payload": encoded_wav,
+                              "sampleRate": SAMPLE_RATE,
+                              "depth": audio_depth
+                              }
+                    self.result_queue.put_nowait(result)
+        # If error, we handle it by sending message saying that TTS failed, but you still get the reply text
         except:
-            tts_result_file_path = None
-
-        if tts_result_file_path:
-            wav_file = AudioSegment.from_wav(tts_result_file_path)
-            wav_data = wav_file.raw_data
-            encoded_wav = base64.b64encode(wav_data).decode('utf-8')
-
-            result = {"message": f"Success.",
-                      "text": reply_text,
-                      "payload": encoded_wav,
-                      "sampleRate": wav_file.frame_rate,
-                      }
-        else:
             result = {"message": f"TTS Failed.",
                       "text": reply_text,
                       "payload": "",
-                      "sampleRate": 24000,
+                      "sampleRate": SAMPLE_RATE,
+                      "depth": 0
                       }
-
-        self.result_queue.put_nowait(result)
+            self.result_queue.put_nowait(result)
 
     def put_new_job(self, job_obj):
         self.job_queue.put_nowait(job_obj)

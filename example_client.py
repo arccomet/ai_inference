@@ -33,8 +33,8 @@ class AudioPlayer:
                 save_path = "wav/example_server_results/result.wav"
                 with wave.open(save_path, "wb") as wav_file:
                     wav_file.setnchannels(1)  # Mono
-                    wav_file.setsampwidth(4)  # 32-bit audio
-                    wav_file.setframerate(int(data["sampleRate"])/2)  # Sample rate (adjust as needed)
+                    wav_file.setsampwidth(data["depth"])
+                    wav_file.setframerate(int(data["sampleRate"]))  # Sample rate (adjust as needed)
                     wav_file.writeframes(audio_io.read())
 
                 play_audio(save_path)

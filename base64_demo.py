@@ -14,7 +14,7 @@ decoded_payload = base64.b64decode(data["payload"])
 save_path = "wav/example_server_results/demo_result.wav"
 with wave.open(save_path, "wb") as wav_file:
     wav_file.setnchannels(1)  # Mono
-    wav_file.setsampwidth(4)  # 32-bit audio
+    wav_file.setsampwidth(2)  # 32-bit audio
     wav_file.setframerate(24000)  # Sample rate (adjust as needed)
     wav_file.writeframes(decoded_payload)
 
