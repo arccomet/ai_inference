@@ -1,3 +1,5 @@
+import time
+
 import utils
 from flask import Flask, request, jsonify
 import threading
@@ -11,6 +13,8 @@ def receive_audio():
     print(request.headers.get('Content-Type'))
     job_obj = request.json
     voice_agent.put_new_job(job_obj)
+
+    voice_agent.send_debug_data(f"Network in {time.time()-float(job_obj['send_time'])}s")
 
     return jsonify({"message": "Processing audio."}), 200
 

@@ -80,6 +80,7 @@ def make_api_call(audio_duration):
 
     # JSON data to send
     data = {"message": "Audio file sent from python client.",
+            "send_time": time.time(),
             "payload": encoded_wav}
 
     # Send POST request

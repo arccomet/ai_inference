@@ -40,20 +40,25 @@ nltk.download('punkt')
 
 def break_into_chunks(text, word_count):
     sentences = nltk.sent_tokenize(text)
+    print(sentences)
     chunks = []
     current_chunk = []
 
     word_count_so_far = 0
     for sentence in sentences:
         words = nltk.word_tokenize(sentence)
-        if word_count_so_far + len(words) <= word_count:
+        print(sentence)
+        print(len(current_chunk))
+        if word_count_so_far + len(words) <= word_count or len(current_chunk) == 0:
             current_chunk.append(sentence)
             word_count_so_far += len(words)
         else:
-            if len(current_chunk) > 0:  # Ensures we have a complete sentence
-                chunks.append(' '.join(current_chunk))
-                current_chunk = [sentence]
-                word_count_so_far = len(words)
+            chunks.append(' '.join(current_chunk))
+            current_chunk.clear()
+            word_count_so_far = 0
+
+            # Put into next chunk
+            current_chunk.append(sentence)
 
     # Add the last chunk if it's not empty
     if len(current_chunk) > 0:
@@ -92,7 +97,7 @@ class XttsTTS:
 
     def tts_full(self, input_prompt, output_dir):
         audio_chunks = []
-        text_chunks = break_into_chunks(input_prompt, 20)
+        text_chunks = break_into_chunks(input_prompt, 16)
 
         for text_chunk in text_chunks:
             generator = self.predict(prompt=text_chunk, language="en",
@@ -115,6 +120,8 @@ class XttsTTS:
     def tts_stream(self, input_prompt, output_dir):
         audio_chunks = []
         text_chunks = break_into_chunks(input_prompt, 20)
+
+        print("TTS => ", text_chunks)
 
         for text_chunk in text_chunks:
             generator = self.predict(prompt=text_chunk, language="en", audio_file_pth=self.speaker_wav)
@@ -169,7 +176,7 @@ class XttsTTS:
                 language,
                 gpt_cond_latent,
                 speaker_embedding,
-                stream_chunk_size=80)
+                stream_chunk_size=40)
 
             first_chunk = True
             for i, chunk in enumerate(chunks):

@@ -27,22 +27,35 @@ class SimpleTurnBaseVoiceAgent:
         # Text output
         self.response_stream_queue = Queue()
 
+    def send_debug_data(self, debug_text):
+        print(f"Debug print: {debug_text}")
+        result = {"message": f"Debug data",
+                  "text": debug_text,
+                  }
+        self.result_queue.put_nowait(result)
+
     def process_job(self, job_obj):
+        start_time = time.time()
+
         decoded_payload = base64.b64decode(job_obj["payload"])
 
         # Speech to text
         text_msg = self.agent_hear.get_transcription(decoded_payload)
         print("Transcribe result", text_msg)
 
+        self.send_debug_data(f"Transcribed in {start_time-time.time()}s")
+        start_time = time.time()
+
         # LLM logic
         reply_text = self.agent_logic.receive_message(text_msg)
+
+        self.send_debug_data(f"Text generation completed in {start_time - time.time()}s")
+        start_time = time.time()
 
         # Text to speech
         try:
             tts_prompt = self.agent_logic.clean_up_text_for_tts(reply_text)
             tts_result_generator = self.agent_tts.tts_stream(tts_prompt, output_dir="wav/outputs")
-
-            print("TTS => ", tts_prompt)
 
             for tts_output in tts_result_generator:
                 output_path = tts_output[0]
@@ -59,6 +72,9 @@ class SimpleTurnBaseVoiceAgent:
                               "depth": audio_depth
                               }
                     self.result_queue.put_nowait(result)
+
+                    self.send_debug_data(f"Audio chunk in {start_time - time.time()}s")
+                    start_time = time.time()
                 else:
                     wav_file = AudioSegment.from_wav(output_path)
                     wav_data = wav_file.raw_data
